@@ -42,9 +42,9 @@ class ShowTableViewCell: UITableViewCell {
     showImageView.translatesAutoresizingMaskIntoConstraints = false
     
     // Show Image View Properties
-    showImageView.contentMode = .scaleAspectFit
-    showImageView.backgroundColor = .red
+    showImageView.contentMode = .scaleAspectFill
     showImageView.layer.cornerRadius = 10
+    showImageView.layer.masksToBounds = true
     
     // Show Image Constraints
     NSLayoutConstraint.activate([
@@ -60,7 +60,7 @@ class ShowTableViewCell: UITableViewCell {
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Title Label Properties
-    titleLabel.font = .systemFont(ofSize: 32)
+    titleLabel.font = .systemFont(ofSize: 24)
     
     // Title Label Constraints
     NSLayoutConstraint.activate([
@@ -75,7 +75,7 @@ class ShowTableViewCell: UITableViewCell {
     episodeLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Episode Label Properties
-    episodeLabel.font = .systemFont(ofSize: 12)
+    episodeLabel.font = .systemFont(ofSize: 16)
     
     // Episode Label Constraints
     NSLayoutConstraint.activate([
@@ -92,6 +92,7 @@ class ShowTableViewCell: UITableViewCell {
     // Description Text Label Properties
     descriptionLabel.numberOfLines = 0
     descriptionLabel.lineBreakMode = .byWordWrapping
+    descriptionLabel.font = .systemFont(ofSize: 12)
     
     // Description Label Constraints
     NSLayoutConstraint.activate([

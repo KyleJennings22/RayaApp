@@ -62,8 +62,8 @@ class EpisodeDetailVC: UIViewController {
     
     // Show Image Properties
     showImageView.contentMode = .scaleAspectFit
-    showImageView.backgroundColor = .red
     showImageView.layer.cornerRadius = 10
+    showImageView.layer.masksToBounds = true
     
     NSLayoutConstraint.activate([
       showImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),

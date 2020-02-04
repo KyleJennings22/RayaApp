@@ -10,42 +10,109 @@ import UIKit
 
 class SeasonsTableVC: UITableViewController {
   
+  // MARK: - Variables
+  var seasons: [Season] = []
+  let cache = NSCache<NSString, UIImage>()
+  
   // MARK: - Lifecycle Functions
   override func viewDidLoad() {
     super.viewDidLoad()
     setupTableView()
   }
   
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    cache.removeAllObjects()
+  }
+  
   // MARK: - Table view data source
   
+  override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    return "Season \(seasons[section].season)"
+  }
+  
+  override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    guard let header = view as? UITableViewHeaderFooterView
+      else { return }
+    
+    // Custom header to look more like the project
+    header.textLabel?.font = .systemFont(ofSize: 28)
+    header.textLabel?.frame = CGRect(x: 16, y: 0, width: header.frame.width, height: header.frame.height)
+    
+  }
+  
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return 1
+    return seasons.count
   }
   
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 5
+    return seasons[section].episodes.count
   }
   
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: ShowTableViewCell.reuseID, for: indexPath) as? ShowTableViewCell
       else { return UITableViewCell() }
     
-    cell.descriptionLabel.text = "al;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdj"
-    cell.titleLabel.text = "Test Title"
-    cell.episodeLabel.text = "Test Episode"
+    // Current Episode
+    let episode = seasons[indexPath.section].episodes[indexPath.row]
+    
+    // This particular API has HTML formatting so need to get rid of that
+    cell.descriptionLabel.text = episode.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+    cell.titleLabel.text = episode.title
+    cell.episodeLabel.text = "Episode \(episode.episode)"
+    
+    let cacheKey = NSString(string: episode.mediumImageURL)
+    
+    
+    if let image = cache.object(forKey: cacheKey) {
+      cell.showImageView.image = image
+      return cell
+    } else {
+      ShowController.shared.getImage(imageURL: episode.mediumImageURL) { [weak self] (result) in
+        guard let self = self else { return }
+        switch result {
+        case .success(let image):
+          self.cache.setObject(image, forKey: cacheKey)
+          DispatchQueue.main.async {
+            cell.showImageView.image = image
+          }
+        case .failure(let error):
+          print(error)
+        }
+      }
+    }
     return cell
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    showSpinner(onView: view)
+    tableView.deselectRow(at: indexPath, animated: true)
+    
     let episodeDetailVC = EpisodeDetailVC()
     episodeDetailVC.providesPresentationContextTransitionStyle = true
     episodeDetailVC.definesPresentationContext = true
     
-    // FIXME: - CHANGE THIS
-    episodeDetailVC.seasonAndEpisodeLabel.text = "Season 1 Episode 1"
-    episodeDetailVC.episodeTitleLabel.text = "Girls with Guns"
-    episodeDetailVC.descriptionLabel.text = "al;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdjal;ksdjfa;klsjdfkl;ajdf;ajf;ldja;fsdj;ajf;asjf;sajf;adjf;ajfd;ajf;dajsf;dajdf;ajf;aj;fajf;ldajf;aj;;;;;;;;;;jflasjdf;asjfd;alsjfas;fj;ljd;ja;fjd;fja;fjd;afja;fdj"
-    present(episodeDetailVC, animated: true)
+    // Episode Selected
+    let episode = seasons[indexPath.section].episodes[indexPath.row]
+    
+    episodeDetailVC.seasonAndEpisodeLabel.text = "Season \(episode.season) Episode \(episode.episode)"
+    episodeDetailVC.episodeTitleLabel.text = episode.title
+    episodeDetailVC.descriptionLabel.text = episode.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+    
+    ShowController.shared.getImage(imageURL: episode.originalImageURL) { [weak self] (result) in
+      guard let self = self else { return }
+      switch result {
+      case .success(let image):
+        DispatchQueue.main.async {
+          episodeDetailVC.showImageView.image = image
+          self.removeSpinner()
+          self.present(episodeDetailVC, animated: true)
+        }
+      case .failure(let error):
+        print(error)
+        self.removeSpinner()
+      }
+    }
   }
   
   // MARK: - Custom Functions

@@ -124,14 +124,15 @@ class TVShowSearchVC: UIViewController {
   /// Function that searches for show once the timer has fired
   @objc func searchForShow() {
     guard let searchText = searchTextField.text,
-    searchText != ""
-    else {
-      shows = []
-      tableView.reloadData()
-      return
+      searchText != ""
+      else {
+        shows = []
+        tableView.reloadData()
+        return
     }
     
-    ShowController.shared.getShows(with: searchText) { (result) in
+    ShowController.shared.getShows(with: searchText) { [weak self] (result) in
+      guard let self = self else { return }
       switch result {
       case .success(let shows):
         self.shows = shows
@@ -162,12 +163,30 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    showSpinner(onView: view)
     tableView.deselectRow(at: indexPath, animated: true)
     let seasonsTableVC = SeasonsTableVC()
     seasonsTableVC.title = shows[indexPath.row].title
-    navigationController?.pushViewController(seasonsTableVC, animated: true)
+    let showID = shows[indexPath.row].id
+    
+    ShowController.shared.getEpisodesFor(showID: showID) { [weak self] (result) in
+      guard let self = self else { return }
+      switch result {
+      case .success(let seasons):
+        seasonsTableVC.seasons = seasons
+        DispatchQueue.main.async {
+          self.removeSpinner()
+          self.navigationController?.pushViewController(seasonsTableVC, animated: true)
+        }
+      case .failure(let error):
+        print(error)
+        self.removeSpinner()
+      }
+    }
   }
 }
+
+
 
 // Safer than typing it every time
 struct ShowCell {

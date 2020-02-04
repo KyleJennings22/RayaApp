@@ -15,16 +15,16 @@ struct Show: Codable {
 
 extension Show {
   init?(dictionary: [String: Any]) {
-    guard let showDictionary = dictionary[Keys.show.rawValue] as? [String: Any],
-      let title = showDictionary[Keys.title.rawValue] as? String,
-      let id = showDictionary[Keys.id.rawValue] as? Int
+    guard let showDictionary = dictionary[ShowKeys.show.rawValue] as? [String: Any],
+      let title = showDictionary[ShowKeys.title.rawValue] as? String,
+      let id = showDictionary[ShowKeys.id.rawValue] as? Int
     else { return nil }
     
     self.init(title: title, id: id)
   }
 }
 
-enum Keys: String {
+enum ShowKeys: String {
   case show = "show"
   case title = "name"
   case id = "id"
