@@ -23,13 +23,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window?.windowScene = windowScene
     window?.rootViewController = createSearchVC()
     window?.makeKeyAndVisible()
-    
   }
 
   func createSearchVC() -> UINavigationController {
     let searchNC = TVShowSearchVC()
     searchNC.title = "Show Search"
-  
     return UINavigationController(rootViewController: searchNC)
   }
 

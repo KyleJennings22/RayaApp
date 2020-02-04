@@ -31,7 +31,7 @@ class EpisodeDetailVC: UIViewController {
   func setupBlur() {
     let blur = UIVisualEffectView()
     blur.frame = view.frame
-    blur.effect = UIBlurEffect(style: .extraLight)
+    blur.effect = UIBlurEffect(style: .regular)
     view.addSubview(blur)
   }
   
@@ -95,7 +95,7 @@ class EpisodeDetailVC: UIViewController {
     // Episode Title Label Properties
     episodeTitleLabel.font = .systemFont(ofSize: 18)
     episodeTitleLabel.textAlignment = .center
-    episodeTitleLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
+    episodeTitleLabel.alpha = 0.5
     
     // Episode Title Label Constraints
     NSLayoutConstraint.activate([
@@ -112,7 +112,7 @@ class EpisodeDetailVC: UIViewController {
     descriptionLabel.numberOfLines = 0
     descriptionLabel.textAlignment = .center
     descriptionLabel.lineBreakMode = .byWordWrapping
-    descriptionLabel.textColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25)
+    descriptionLabel.alpha = 0.25
     
     // Description Label Constraints
     NSLayoutConstraint.activate([

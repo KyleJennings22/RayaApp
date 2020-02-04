@@ -61,23 +61,25 @@ class SeasonsTableVC: UITableViewController {
     cell.titleLabel.text = episode.title
     cell.episodeLabel.text = "Episode \(episode.episode)"
     
-    let cacheKey = NSString(string: episode.mediumImageURL)
+    let cacheKey = NSString(string: episode.title)
     
     
     if let image = cache.object(forKey: cacheKey) {
       cell.showImageView.image = image
       return cell
     } else {
-      ShowController.shared.getImage(imageURL: episode.mediumImageURL) { [weak self] (result) in
-        guard let self = self else { return }
-        switch result {
-        case .success(let image):
-          self.cache.setObject(image, forKey: cacheKey)
-          DispatchQueue.main.async {
-            cell.showImageView.image = image
+      if let mediumImageURL = episode.mediumImageURL {
+        ShowController.shared.getImage(imageURL: mediumImageURL) { [weak self] (result) in
+          guard let self = self else { return }
+          switch result {
+          case .success(let image):
+            self.cache.setObject(image, forKey: cacheKey)
+            DispatchQueue.main.async {
+              cell.showImageView.image = image
+            }
+          case .failure(let error):
+            print(error)
           }
-        case .failure(let error):
-          print(error)
         }
       }
     }
@@ -85,7 +87,7 @@ class SeasonsTableVC: UITableViewController {
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    showSpinner(onView: view)
+    showSpinner(onView: self.view)
     tableView.deselectRow(at: indexPath, animated: true)
     
     let episodeDetailVC = EpisodeDetailVC()
@@ -98,20 +100,25 @@ class SeasonsTableVC: UITableViewController {
     episodeDetailVC.seasonAndEpisodeLabel.text = "Season \(episode.season) Episode \(episode.episode)"
     episodeDetailVC.episodeTitleLabel.text = episode.title
     episodeDetailVC.descriptionLabel.text = episode.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-    
-    ShowController.shared.getImage(imageURL: episode.originalImageURL) { [weak self] (result) in
-      guard let self = self else { return }
-      switch result {
-      case .success(let image):
-        DispatchQueue.main.async {
-          episodeDetailVC.showImageView.image = image
+    if let originalImageURL = episode.originalImageURL,
+      originalImageURL != "" {
+      ShowController.shared.getImage(imageURL: originalImageURL) { [weak self] (result) in
+        guard let self = self else { return }
+        switch result {
+        case .success(let image):
+          DispatchQueue.main.async {
+            episodeDetailVC.showImageView.image = image
+            self.removeSpinner()
+            self.present(episodeDetailVC, animated: true)
+          }
+        case .failure(let error):
+          print(error)
           self.removeSpinner()
-          self.present(episodeDetailVC, animated: true)
         }
-      case .failure(let error):
-        print(error)
-        self.removeSpinner()
       }
+    } else {
+      removeSpinner()
+      present(episodeDetailVC, animated: true)
     }
   }
   

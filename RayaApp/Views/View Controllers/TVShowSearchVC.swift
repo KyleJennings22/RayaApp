@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TVShowSearchVC: UIViewController {
+class TVShowSearchVC: UIViewController, UITextFieldDelegate {
   
   // Views
   let searchTextField = UITextField()
@@ -46,6 +46,8 @@ class TVShowSearchVC: UIViewController {
     
     // Search Textfield Properties
     searchTextField.borderStyle = .roundedRect
+    searchTextField.backgroundColor = .clear
+    searchTextField.delegate = self
     searchTextField.addTarget(self, action: #selector(textFieldValueChanged), for: .editingChanged)
     
     // Search Button Properties
@@ -58,7 +60,7 @@ class TVShowSearchVC: UIViewController {
     // Search Image Properties
     searchImage.image = UIImage(systemName: "magnifyingglass")
     searchImage.contentMode = .scaleAspectFit
-    searchImage.tintColor = UIColor.black
+    searchImage.tintColor = .systemFill
     
     // Constraining sizes for objects
     NSLayoutConstraint.activate([
@@ -101,11 +103,12 @@ class TVShowSearchVC: UIViewController {
   
   // MARK: - Custom Functions
   func configureNavigationBar() {
-    navigationController?.navigationBar.prefersLargeTitles = true
+    let nav = navigationController?.navigationBar
+    nav?.prefersLargeTitles = true
   }
   
   func setupViews() {
-    view.backgroundColor = UIColor.white
+    view.backgroundColor = .systemBackground
   }
   
   @objc func clearTextField() {
@@ -163,6 +166,7 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    searchTextField.resignFirstResponder()
     showSpinner(onView: view)
     tableView.deselectRow(at: indexPath, animated: true)
     let seasonsTableVC = SeasonsTableVC()
@@ -185,8 +189,6 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
     }
   }
 }
-
-
 
 // Safer than typing it every time
 struct ShowCell {
