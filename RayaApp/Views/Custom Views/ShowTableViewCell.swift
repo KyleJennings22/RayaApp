@@ -22,6 +22,10 @@ class ShowTableViewCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     configureCell()
+    setupShowImageView()
+    setupTitleLabel()
+    setupEpisodeLabel()
+    setupDescriptionLabel()
   }
   
   // This is required for storyboards, I am not using storyboard so I can leave this as is.
@@ -30,15 +34,12 @@ class ShowTableViewCell: UITableViewCell {
   }
   
   func configureCell() {
+    accessoryType = .disclosureIndicator
+  }
+  
+  func setupShowImageView() {
     addSubview(showImageView)
-    addSubview(titleLabel)
-    addSubview(episodeLabel)
-    addSubview(descriptionLabel)
-    
     showImageView.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    episodeLabel.translatesAutoresizingMaskIntoConstraints = false
-    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Show Image View Properties
     showImageView.contentMode = .scaleAspectFit
@@ -52,6 +53,11 @@ class ShowTableViewCell: UITableViewCell {
       showImageView.heightAnchor.constraint(equalToConstant: 60),
       showImageView.widthAnchor.constraint(equalToConstant: 60)
     ])
+  }
+  
+  func setupTitleLabel() {
+    addSubview(titleLabel)
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Title Label Properties
     titleLabel.font = .systemFont(ofSize: 32)
@@ -62,6 +68,11 @@ class ShowTableViewCell: UITableViewCell {
       titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
       titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 4)
     ])
+  }
+  
+  func setupEpisodeLabel() {
+    addSubview(episodeLabel)
+    episodeLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Episode Label Properties
     episodeLabel.font = .systemFont(ofSize: 12)
@@ -72,8 +83,13 @@ class ShowTableViewCell: UITableViewCell {
       episodeLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
       episodeLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8)
     ])
+  }
+  
+  func setupDescriptionLabel() {
+    addSubview(descriptionLabel)
+    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     
-    // Description Text View Properties
+    // Description Text Label Properties
     descriptionLabel.numberOfLines = 0
     descriptionLabel.lineBreakMode = .byWordWrapping
     
@@ -84,8 +100,5 @@ class ShowTableViewCell: UITableViewCell {
       descriptionLabel.topAnchor.constraint(equalTo: episodeLabel.bottomAnchor, constant: 4),
       descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
     ])
-    
-    accessoryType = .disclosureIndicator
-    
   }
 }

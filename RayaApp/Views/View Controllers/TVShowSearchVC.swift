@@ -134,6 +134,7 @@ extension TVShowSearchVC: UITextFieldDelegate {
   
 }
 
-enum ShowCell {
+// Safer than typing it every time
+struct ShowCell {
   static let showCell = "showCell"
 }

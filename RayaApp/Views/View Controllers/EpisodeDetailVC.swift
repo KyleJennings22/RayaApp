@@ -21,6 +21,10 @@ class EpisodeDetailVC: UIViewController {
     super.viewDidLoad()
     setupBlur()
     setupScrollView()
+    setupShowImageView()
+    setupSeasonAndEpisodeLabel()
+    setupEpisodeTitleLabel()
+    setupDescriptionLabel()
   }
   
   // Custom Functions
@@ -32,24 +36,13 @@ class EpisodeDetailVC: UIViewController {
   }
   
   func setupScrollView() {
-    scrollView.addSubview(showImageView)
-    scrollView.addSubview(seasonAndEpisodeLabel)
-    scrollView.addSubview(episodeTitleLabel)
-    scrollView.addSubview(descriptionLabel)
-    
     view.addSubview(scrollView)
-    
-    showImageView.translatesAutoresizingMaskIntoConstraints = false
-    seasonAndEpisodeLabel.translatesAutoresizingMaskIntoConstraints = false
-    episodeTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     
     scrollView.showsVerticalScrollIndicator = true
     scrollView.isScrollEnabled = true
     
     // Scroll View Properties
-//    scrollView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
     scrollView.contentSize = CGSize(width: view.frame.width, height: view.frame.height)
     
     // Scroll View Constraints
@@ -59,6 +52,13 @@ class EpisodeDetailVC: UIViewController {
       scrollView.topAnchor.constraint(equalTo: view.topAnchor),
       scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
     ])
+    
+    
+  }
+  
+  func setupShowImageView() {
+    scrollView.addSubview(showImageView)
+    showImageView.translatesAutoresizingMaskIntoConstraints = false
     
     // Show Image Properties
     showImageView.contentMode = .scaleAspectFit
@@ -71,6 +71,11 @@ class EpisodeDetailVC: UIViewController {
       showImageView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 32),
       showImageView.heightAnchor.constraint(equalToConstant: 200)
     ])
+  }
+  
+  func setupSeasonAndEpisodeLabel() {
+    scrollView.addSubview(seasonAndEpisodeLabel)
+    seasonAndEpisodeLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Season and Episode Label Properties
     seasonAndEpisodeLabel.font = .systemFont(ofSize: 32)
@@ -81,6 +86,11 @@ class EpisodeDetailVC: UIViewController {
       seasonAndEpisodeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       seasonAndEpisodeLabel.topAnchor.constraint(equalTo: showImageView.bottomAnchor, constant: 16),
     ])
+  }
+  
+  func setupEpisodeTitleLabel() {
+    scrollView.addSubview(episodeTitleLabel)
+    episodeTitleLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Episode Title Label Properties
     episodeTitleLabel.font = .systemFont(ofSize: 18)
@@ -92,6 +102,11 @@ class EpisodeDetailVC: UIViewController {
       episodeTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       episodeTitleLabel.topAnchor.constraint(equalTo: seasonAndEpisodeLabel.bottomAnchor, constant: 24)
     ])
+  }
+  
+  func setupDescriptionLabel() {
+    scrollView.addSubview(descriptionLabel)
+    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
     
     // Description Label Properties
     descriptionLabel.numberOfLines = 0
@@ -106,6 +121,5 @@ class EpisodeDetailVC: UIViewController {
       descriptionLabel.topAnchor.constraint(equalTo: episodeTitleLabel.bottomAnchor, constant: 16),
       descriptionLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
     ])
-    
   }
 }
