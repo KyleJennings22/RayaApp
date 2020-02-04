@@ -34,6 +34,11 @@ class TVShowSearchVC: UIViewController {
     
     view.addSubview(searchStackView)
     
+    searchTextField.translatesAutoresizingMaskIntoConstraints = false
+    searchImage.translatesAutoresizingMaskIntoConstraints = false
+    searchButton.translatesAutoresizingMaskIntoConstraints = false
+    searchStackView.translatesAutoresizingMaskIntoConstraints = false
+    
     // Search Textfield Properties
     searchTextField.borderStyle = .roundedRect
     
@@ -54,11 +59,6 @@ class TVShowSearchVC: UIViewController {
       searchImage.heightAnchor.constraint(equalTo: searchTextField.heightAnchor),
       searchButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.15)
     ])
-    
-    searchTextField.translatesAutoresizingMaskIntoConstraints = false
-    searchImage.translatesAutoresizingMaskIntoConstraints = false
-    searchButton.translatesAutoresizingMaskIntoConstraints = false
-    searchStackView.translatesAutoresizingMaskIntoConstraints = false
     
     // Stackview Properties
     searchStackView.alignment = .fill
@@ -84,6 +84,7 @@ class TVShowSearchVC: UIViewController {
     
     tableView.translatesAutoresizingMaskIntoConstraints = false
     
+    // Constraints for Table View
     NSLayoutConstraint.activate([
       tableView.topAnchor.constraint(equalTo: searchStackView.bottomAnchor, constant: 24),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -119,6 +120,13 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
     cell.accessoryType = .disclosureIndicator
     
     return cell
+  }
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.deselectRow(at: indexPath, animated: true)
+    let seasonsTableVC = SeasonsTableVC()
+    seasonsTableVC.title = "Test"
+    navigationController?.pushViewController(seasonsTableVC, animated: true)
   }
 }
 
