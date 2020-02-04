@@ -13,9 +13,14 @@ class TVShowSearchVC: UIViewController {
   // Views
   let searchTextField = UITextField()
   let searchImage = UIImageView()
-  var searchButton = UIButton()
+  var clearButton = UIButton()
   let searchStackView = UIStackView()
   let tableView = UITableView()
+  
+  // Variables
+  var shows: [Show] = []
+  var timer: Timer?
+  let delayTime: Double = 0.5
   
   // MARK: - Lifecycle Functions
   override func viewDidLoad() {
@@ -30,23 +35,25 @@ class TVShowSearchVC: UIViewController {
   func setupSearchView() {
     searchStackView.addArrangedSubview(searchImage)
     searchStackView.addArrangedSubview(searchTextField)
-    searchStackView.addArrangedSubview(searchButton)
+    searchStackView.addArrangedSubview(clearButton)
     
     view.addSubview(searchStackView)
     
     searchTextField.translatesAutoresizingMaskIntoConstraints = false
     searchImage.translatesAutoresizingMaskIntoConstraints = false
-    searchButton.translatesAutoresizingMaskIntoConstraints = false
+    clearButton.translatesAutoresizingMaskIntoConstraints = false
     searchStackView.translatesAutoresizingMaskIntoConstraints = false
     
     // Search Textfield Properties
     searchTextField.borderStyle = .roundedRect
+    searchTextField.addTarget(self, action: #selector(textFieldValueChanged), for: .editingChanged)
     
     // Search Button Properties
-    searchButton.backgroundColor = .systemBlue
-    searchButton.setTitle("Search", for: .normal)
-    searchButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
-    searchButton.layer.cornerRadius = 5
+    clearButton.backgroundColor = .systemBlue
+    clearButton.setTitle("Clear", for: .normal)
+    clearButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+    clearButton.layer.cornerRadius = 5
+    clearButton.addTarget(self, action: #selector(clearTextField), for: .touchUpInside)
     
     // Search Image Properties
     searchImage.image = UIImage(systemName: "magnifyingglass")
@@ -55,14 +62,13 @@ class TVShowSearchVC: UIViewController {
     
     // Constraining sizes for objects
     NSLayoutConstraint.activate([
-      searchTextField.trailingAnchor.constraint(equalTo: searchButton.leadingAnchor, constant: -8),
-      searchImage.heightAnchor.constraint(equalTo: searchTextField.heightAnchor),
-      searchButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.15)
+      searchImage.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.05),
+      clearButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.15)
     ])
     
     // Stackview Properties
     searchStackView.alignment = .fill
-    searchStackView.distribution = .fill
+    searchStackView.distribution = .fillProportionally
     searchStackView.axis = .horizontal
     searchStackView.spacing = 4
     
@@ -102,20 +108,53 @@ class TVShowSearchVC: UIViewController {
     view.backgroundColor = UIColor.white
   }
   
+  @objc func clearTextField() {
+    searchTextField.text = ""
+    shows = []
+    tableView.reloadData()
+  }
   
-  // MARK: - Navigation
+  /// Function that happens every time the textfield is changed
+  @objc func textFieldValueChanged() {
+    timer?.invalidate()
+    
+    timer = Timer.scheduledTimer(timeInterval: delayTime, target: self, selector: #selector(searchForShow), userInfo: nil, repeats: false)
+  }
   
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+  /// Function that searches for show once the timer has fired
+  @objc func searchForShow() {
+    guard let searchText = searchTextField.text,
+    searchText != ""
+    else {
+      shows = []
+      tableView.reloadData()
+      return
+    }
+    
+    ShowController.shared.getShows(with: searchText) { (result) in
+      switch result {
+      case .success(let shows):
+        self.shows = shows
+        DispatchQueue.main.async {
+          self.tableView.reloadData()
+        }
+      case .failure(let error):
+        print(error)
+      }
+    }
   }
 }
 
 extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 5
+    return shows.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: ShowCell.showCell, for: indexPath)
+    
+    let show = shows[indexPath.row]
+    cell.textLabel?.text = show.title
     
     cell.accessoryType = .disclosureIndicator
     
@@ -125,13 +164,9 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
     let seasonsTableVC = SeasonsTableVC()
-    seasonsTableVC.title = "Test"
+    seasonsTableVC.title = shows[indexPath.row].title
     navigationController?.pushViewController(seasonsTableVC, animated: true)
   }
-}
-
-extension TVShowSearchVC: UITextFieldDelegate {
-  
 }
 
 // Safer than typing it every time

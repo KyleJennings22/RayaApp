@@ -15,6 +15,10 @@
 		27266B6D23E9131A00949DD5 /* ShowTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B6C23E9131A00949DD5 /* ShowTableViewCell.swift */; };
 		27266B6F23E9177D00949DD5 /* SeasonsTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B6E23E9177D00949DD5 /* SeasonsTableVC.swift */; };
 		27266B7123E9246500949DD5 /* EpisodeDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7023E9246500949DD5 /* EpisodeDetailVC.swift */; };
+		27266B7323E9C55300949DD5 /* Show.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7223E9C55200949DD5 /* Show.swift */; };
+		27266B7523E9C5AC00949DD5 /* Season.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7423E9C5AC00949DD5 /* Season.swift */; };
+		27266B7723E9C5D200949DD5 /* Episode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7623E9C5D200949DD5 /* Episode.swift */; };
+		27266B7A23E9C66E00949DD5 /* ShowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7923E9C66E00949DD5 /* ShowController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +32,10 @@
 		27266B6C23E9131A00949DD5 /* ShowTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowTableViewCell.swift; sourceTree = "<group>"; };
 		27266B6E23E9177D00949DD5 /* SeasonsTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonsTableVC.swift; sourceTree = "<group>"; };
 		27266B7023E9246500949DD5 /* EpisodeDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeDetailVC.swift; sourceTree = "<group>"; };
+		27266B7223E9C55200949DD5 /* Show.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Show.swift; sourceTree = "<group>"; };
+		27266B7423E9C5AC00949DD5 /* Season.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Season.swift; sourceTree = "<group>"; };
+		27266B7623E9C5D200949DD5 /* Episode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Episode.swift; sourceTree = "<group>"; };
+		27266B7923E9C66E00949DD5 /* ShowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +70,7 @@
 			children = (
 				27266B6723E901DB00949DD5 /* Resources */,
 				27266B6623E901CD00949DD5 /* Views */,
+				27266B7823E9C65E00949DD5 /* Model Controllers */,
 				27266B6523E901C600949DD5 /* Models */,
 			);
 			path = RayaApp;
@@ -70,6 +79,9 @@
 		27266B6523E901C600949DD5 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				27266B7223E9C55200949DD5 /* Show.swift */,
+				27266B7423E9C5AC00949DD5 /* Season.swift */,
+				27266B7623E9C5D200949DD5 /* Episode.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -77,7 +89,7 @@
 		27266B6623E901CD00949DD5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				27266B6B23E912E400949DD5 /* Custom Views */,
+				27266B6B23E912E400949DD5 /* Custom Cells */,
 				27266B6823E9020300949DD5 /* View Controllers */,
 			);
 			path = Views;
@@ -105,12 +117,20 @@
 			path = "View Controllers";
 			sourceTree = "<group>";
 		};
-		27266B6B23E912E400949DD5 /* Custom Views */ = {
+		27266B6B23E912E400949DD5 /* Custom Cells */ = {
 			isa = PBXGroup;
 			children = (
 				27266B6C23E9131A00949DD5 /* ShowTableViewCell.swift */,
 			);
-			path = "Custom Views";
+			path = "Custom Cells";
+			sourceTree = "<group>";
+		};
+		27266B7823E9C65E00949DD5 /* Model Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				27266B7923E9C66E00949DD5 /* ShowController.swift */,
+			);
+			path = "Model Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,11 +203,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27266B7523E9C5AC00949DD5 /* Season.swift in Sources */,
 				27266B5223E8FFCA00949DD5 /* AppDelegate.swift in Sources */,
+				27266B7A23E9C66E00949DD5 /* ShowController.swift in Sources */,
 				27266B7123E9246500949DD5 /* EpisodeDetailVC.swift in Sources */,
 				27266B5423E8FFCA00949DD5 /* SceneDelegate.swift in Sources */,
 				27266B6D23E9131A00949DD5 /* ShowTableViewCell.swift in Sources */,
+				27266B7323E9C55300949DD5 /* Show.swift in Sources */,
 				27266B6A23E9021A00949DD5 /* TVShowSearchVC.swift in Sources */,
+				27266B7723E9C5D200949DD5 /* Episode.swift in Sources */,
 				27266B6F23E9177D00949DD5 /* SeasonsTableVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
