@@ -115,6 +115,34 @@ class ShowController {
     }
     task.resume()
   }
+  
+  // Function to get images for specified image URL
+  func getImage(imageURL: String, completion: @escaping(Result<UIImage, ShowAPIError>) -> Void) {
+    
+    // Creating the URL
+    guard let fetchImageURL = URL(string: imageURL)
+      else { return completion(.failure(.invalidURL)) }
+    
+    // Making the network request
+    let task = URLSession.shared.dataTask(with: fetchImageURL) { (data, _, error) in
+      if let error = error {
+        print(error, error.localizedDescription)
+        return completion(.failure(.noData))
+      }
+      
+      // Guarding against nil
+      guard let data = data
+        else { return completion(.failure(.invalidData)) }
+      
+      // Compressing the image a bit to save space and make runtimes quicker
+      guard let imageData = UIImage(data: data)?.jpegData(compressionQuality: 0.5),
+        let image = UIImage(data: imageData)
+        else { return completion(.failure(.unableToDecodeData)) }
+      
+      return completion(.success(image))
+    }
+    task.resume()
+  }
 }
 
 enum baseURL: String {
