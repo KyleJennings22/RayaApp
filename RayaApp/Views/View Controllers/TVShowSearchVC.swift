@@ -8,12 +8,12 @@
 
 import UIKit
 
-class TVShowSearchVC: UIViewController, UITextFieldDelegate {
+class TVShowSearchVC: UIViewController {
   
   // Views
   let searchTextField = UITextField()
   let searchImage = UIImageView()
-  var clearButton = UIButton()
+  let clearButton = UIButton()
   let searchStackView = UIStackView()
   let tableView = UITableView()
   
@@ -21,6 +21,7 @@ class TVShowSearchVC: UIViewController, UITextFieldDelegate {
   var shows: [Show] = []
   var timer: Timer?
   let delayTime: Double = 0.5
+  let indicator = UIActivityIndicatorView(style: .large)
   
   // MARK: - Lifecycle Functions
   override func viewDidLoad() {
@@ -29,9 +30,16 @@ class TVShowSearchVC: UIViewController, UITextFieldDelegate {
     configureNavigationBar()
     setupSearchView()
     setupTableView()
+    setupActivityIndicator()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    indicator.stopAnimating()
   }
   
   // MARK: - View Setup
+  /// Sets up the horizontal stack view for the search icon, text field and clear button
   func setupSearchView() {
     searchStackView.addArrangedSubview(searchImage)
     searchStackView.addArrangedSubview(searchTextField)
@@ -84,13 +92,12 @@ class TVShowSearchVC: UIViewController, UITextFieldDelegate {
   
   func setupTableView() {
     view.addSubview(tableView)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
     
     // TableView Properties
     tableView.delegate = self
     tableView.dataSource = self
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: ShowCell.showCell)
-    
-    tableView.translatesAutoresizingMaskIntoConstraints = false
     
     // Constraints for Table View
     NSLayoutConstraint.activate([
@@ -103,8 +110,7 @@ class TVShowSearchVC: UIViewController, UITextFieldDelegate {
   
   // MARK: - Custom Functions
   func configureNavigationBar() {
-    let nav = navigationController?.navigationBar
-    nav?.prefersLargeTitles = true
+    navigationController?.navigationBar.prefersLargeTitles = true
   }
   
   func setupViews() {
@@ -114,23 +120,32 @@ class TVShowSearchVC: UIViewController, UITextFieldDelegate {
   @objc func clearTextField() {
     searchTextField.text = ""
     shows = []
+    indicator.stopAnimating()
     tableView.reloadData()
   }
   
   /// Function that happens every time the textfield is changed
   @objc func textFieldValueChanged() {
+    indicator.startAnimating()
     timer?.invalidate()
-    
     timer = Timer.scheduledTimer(timeInterval: delayTime, target: self, selector: #selector(searchForShow), userInfo: nil, repeats: false)
   }
   
   /// Function that searches for show once the timer has fired
   @objc func searchForShow() {
+    
+    // Canceling network request when new search is made
+    if ShowController.shared.showTask != nil {
+      ShowController.shared.showTask?.cancel()
+    }
+    
+    // Clearing the shows array and reloading the table view if no text exists
     guard let searchText = searchTextField.text,
       searchText != ""
       else {
         shows = []
         tableView.reloadData()
+        indicator.stopAnimating()
         return
     }
     
@@ -138,14 +153,30 @@ class TVShowSearchVC: UIViewController, UITextFieldDelegate {
       guard let self = self else { return }
       switch result {
       case .success(let shows):
-        self.shows = shows
         DispatchQueue.main.async {
+          self.shows = shows
+          self.indicator.stopAnimating()
           self.tableView.reloadData()
         }
       case .failure(let error):
         print(error)
       }
     }
+  }
+  
+  func setupActivityIndicator() {
+    view.addSubview(indicator)
+    indicator.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Indicator Properties
+    indicator.hidesWhenStopped = true
+    
+    NSLayoutConstraint.activate([
+      indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      indicator.heightAnchor.constraint(equalToConstant: 40),
+      indicator.widthAnchor.constraint(equalToConstant: 40)
+    ])
   }
 }
 
@@ -158,8 +189,8 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
     let cell = tableView.dequeueReusableCell(withIdentifier: ShowCell.showCell, for: indexPath)
     
     let show = shows[indexPath.row]
-    cell.textLabel?.text = show.title
     
+    cell.textLabel?.text = show.title
     cell.accessoryType = .disclosureIndicator
     
     return cell
@@ -167,10 +198,13 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     searchTextField.resignFirstResponder()
-    showSpinner(onView: view)
+    indicator.startAnimating()
+    
     tableView.deselectRow(at: indexPath, animated: true)
+    
     let seasonsTableVC = SeasonsTableVC()
     seasonsTableVC.title = shows[indexPath.row].title
+    
     let showID = shows[indexPath.row].id
     
     ShowController.shared.getEpisodesFor(showID: showID) { [weak self] (result) in
@@ -179,14 +213,19 @@ extension TVShowSearchVC: UITableViewDelegate, UITableViewDataSource {
       case .success(let seasons):
         seasonsTableVC.seasons = seasons
         DispatchQueue.main.async {
-          self.removeSpinner()
+          self.indicator.stopAnimating()
           self.navigationController?.pushViewController(seasonsTableVC, animated: true)
         }
       case .failure(let error):
         print(error)
-        self.removeSpinner()
       }
     }
+  }
+}
+
+extension TVShowSearchVC: UITextFieldDelegate {
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    textField.resignFirstResponder()
   }
 }
 

@@ -8,20 +8,22 @@
 
 import Foundation
 
-struct Season: Codable {
+struct Season {
   let season: Int
   var episodes: [Episode]
 }
 
 extension Season {
+  /// Initializer to make it easier to convert from JSON to our custom Season object
   init?(dictionary: [String: Any]) {
     guard let season = dictionary[SeasonKeys.season.rawValue] as? Int
       else { return nil }
-      
+    
     self.init(season: season, episodes: [])
   }
 }
 
+// Conforming to equatable to prevent duplicates in Seasons array
 extension Season: Equatable {
   static func == (lhs: Season, rhs: Season) -> Bool {
     return lhs.season == rhs.season

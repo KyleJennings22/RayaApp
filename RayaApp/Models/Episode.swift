@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Episode: Codable {
+struct Episode {
   let season: Int
   let episode: Int
   let title: String
@@ -18,6 +18,7 @@ struct Episode: Codable {
 }
 
 extension Episode {
+  /// Initializer to make it easier to convert from JSON to our custom Episode object
   init?(dictionary: [String: Any]) {
     guard let season = dictionary[EpisodeKeys.season.rawValue] as? Int,
       let episode = dictionary[EpisodeKeys.episodeNumber.rawValue] as? Int,
@@ -25,6 +26,7 @@ extension Episode {
       let description = dictionary[EpisodeKeys.description.rawValue] as? String
       else { return nil }
     
+    // Some episodes do not contain images, this is why they are not included in the guard statement
     let imageDict = dictionary[EpisodeKeys.imageDict.rawValue] as? [String: Any]
     let mediumImageURL = imageDict?[EpisodeKeys.mediumImage.rawValue] as? String
     let originalImageURL = imageDict?[EpisodeKeys.originalImaage.rawValue] as? String

@@ -9,15 +9,19 @@
 import UIKit
 
 class ShowTableViewCell: UITableViewCell {
-
+  
   static let reuseID = "seasonCell"
   
+  let cache = ShowController.shared.cache
+  
   // Custom Views
-  let showImageView = UIImageView()
+  var showImageView = UIImageView()
   let titleLabel = UILabel()
   let episodeLabel = UILabel()
   let descriptionLabel = UILabel()
   
+  // Properties
+  private var task: URLSessionDataTask?
   
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -28,13 +32,55 @@ class ShowTableViewCell: UITableViewCell {
     setupDescriptionLabel()
   }
   
-  // This is required for storyboards, I am not using storyboard so I can leave this as is.
+  // When a cell is about to be reused, need to cancel the current download to avoid image issues
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    task?.cancel()
+    showImageView.image = nil
+  }
+  
+  // This is required for storyboards, I am not using storyboards so I can leave this as is.
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
   func configureCell() {
     accessoryType = .disclosureIndicator
+  }
+  
+  // I'll explain why I put this here
+  func downloadImage(imageURL: String?) {
+    showImageView.image = nil
+    guard let imageURL = imageURL
+      else { return }
+    let cacheKey = NSString(string: imageURL)
+    
+    // If the image is already in the cache, lets use it instead of re-downloading
+    if let image = cache.object(forKey: cacheKey) {
+      showImageView.image = image
+      return
+    }
+    
+    guard let url = URL(string: imageURL)
+      else { return }
+    
+    task = URLSession.shared.dataTask(with: url) { [weak self] (data, _, error) in
+      guard let self = self else { return }
+      if let error = error {
+        print(error)
+        return
+      }
+      
+      guard let data = data,
+        let image = UIImage(data: data)
+        else { return }
+      self.cache.setObject(image, forKey: cacheKey)
+      
+      DispatchQueue.main.async {
+        self.showImageView.image = image
+      }
+    }
+    task?.resume()
   }
   
   func setupShowImageView() {
@@ -45,6 +91,7 @@ class ShowTableViewCell: UITableViewCell {
     showImageView.contentMode = .scaleAspectFill
     showImageView.layer.cornerRadius = 10
     showImageView.layer.masksToBounds = true
+    
     
     // Show Image Constraints
     NSLayoutConstraint.activate([

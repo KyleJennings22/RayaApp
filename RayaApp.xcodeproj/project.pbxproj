@@ -19,7 +19,6 @@
 		27266B7523E9C5AC00949DD5 /* Season.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7423E9C5AC00949DD5 /* Season.swift */; };
 		27266B7723E9C5D200949DD5 /* Episode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7623E9C5D200949DD5 /* Episode.swift */; };
 		27266B7A23E9C66E00949DD5 /* ShowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7923E9C66E00949DD5 /* ShowController.swift */; };
-		27266B7F23EA1D3500949DD5 /* Ext+UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27266B7E23EA1D3500949DD5 /* Ext+UIViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,7 +36,6 @@
 		27266B7423E9C5AC00949DD5 /* Season.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Season.swift; sourceTree = "<group>"; };
 		27266B7623E9C5D200949DD5 /* Episode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Episode.swift; sourceTree = "<group>"; };
 		27266B7923E9C66E00949DD5 /* ShowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowController.swift; sourceTree = "<group>"; };
-		27266B7E23EA1D3500949DD5 /* Ext+UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Ext+UIViewController.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,7 +68,6 @@
 		27266B5023E8FFCA00949DD5 /* RayaApp */ = {
 			isa = PBXGroup;
 			children = (
-				27266B7D23EA1D1100949DD5 /* Helpers */,
 				27266B6723E901DB00949DD5 /* Resources */,
 				27266B6623E901CD00949DD5 /* Views */,
 				27266B7823E9C65E00949DD5 /* Model Controllers */,
@@ -134,14 +131,6 @@
 				27266B7923E9C66E00949DD5 /* ShowController.swift */,
 			);
 			path = "Model Controllers";
-			sourceTree = "<group>";
-		};
-		27266B7D23EA1D1100949DD5 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				27266B7E23EA1D3500949DD5 /* Ext+UIViewController.swift */,
-			);
-			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -218,7 +207,6 @@
 				27266B5223E8FFCA00949DD5 /* AppDelegate.swift in Sources */,
 				27266B7A23E9C66E00949DD5 /* ShowController.swift in Sources */,
 				27266B7123E9246500949DD5 /* EpisodeDetailVC.swift in Sources */,
-				27266B7F23EA1D3500949DD5 /* Ext+UIViewController.swift in Sources */,
 				27266B5423E8FFCA00949DD5 /* SceneDelegate.swift in Sources */,
 				27266B6D23E9131A00949DD5 /* ShowTableViewCell.swift in Sources */,
 				27266B7323E9C55300949DD5 /* Show.swift in Sources */,

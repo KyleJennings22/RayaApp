@@ -8,17 +8,19 @@
 
 import Foundation
 
-struct Show: Codable {
+struct Show {
   let title: String
   let id: Int
 }
 
+
 extension Show {
+  /// Initializer to make it easier to convert from JSON to our custom Show object
   init?(dictionary: [String: Any]) {
     guard let showDictionary = dictionary[ShowKeys.show.rawValue] as? [String: Any],
       let title = showDictionary[ShowKeys.title.rawValue] as? String,
       let id = showDictionary[ShowKeys.id.rawValue] as? Int
-    else { return nil }
+      else { return nil }
     
     self.init(title: title, id: id)
   }

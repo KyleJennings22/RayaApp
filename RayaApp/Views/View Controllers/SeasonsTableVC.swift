@@ -12,12 +12,15 @@ class SeasonsTableVC: UITableViewController {
   
   // MARK: - Variables
   var seasons: [Season] = []
-  let cache = NSCache<NSString, UIImage>()
+  let cache = ShowController.shared.cache
+  let indicator = UIActivityIndicatorView(style: .large)
   
   // MARK: - Lifecycle Functions
   override func viewDidLoad() {
     super.viewDidLoad()
     setupTableView()
+    setupActivityIndicator()
+    cache.removeAllObjects()
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -35,7 +38,7 @@ class SeasonsTableVC: UITableViewController {
     guard let header = view as? UITableViewHeaderFooterView
       else { return }
     
-    // Custom header to look more like the project
+    // Custom header to look more like the project specs
     header.textLabel?.font = .systemFont(ofSize: 28)
     header.textLabel?.frame = CGRect(x: 16, y: 0, width: header.frame.width, height: header.frame.height)
     
@@ -60,36 +63,16 @@ class SeasonsTableVC: UITableViewController {
     cell.descriptionLabel.text = episode.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
     cell.titleLabel.text = episode.title
     cell.episodeLabel.text = "Episode \(episode.episode)"
+    cell.downloadImage(imageURL: episode.mediumImageURL)
     
-    let cacheKey = NSString(string: episode.title)
-    
-    
-    if let image = cache.object(forKey: cacheKey) {
-      cell.showImageView.image = image
-      return cell
-    } else {
-      if let mediumImageURL = episode.mediumImageURL {
-        ShowController.shared.getImage(imageURL: mediumImageURL) { [weak self] (result) in
-          guard let self = self else { return }
-          switch result {
-          case .success(let image):
-            self.cache.setObject(image, forKey: cacheKey)
-            DispatchQueue.main.async {
-              cell.showImageView.image = image
-            }
-          case .failure(let error):
-            print(error)
-          }
-        }
-      }
-    }
     return cell
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    showSpinner(onView: self.view)
     tableView.deselectRow(at: indexPath, animated: true)
+    indicator.startAnimating()
     
+    // Getting the next view controller
     let episodeDetailVC = EpisodeDetailVC()
     episodeDetailVC.providesPresentationContextTransitionStyle = true
     episodeDetailVC.definesPresentationContext = true
@@ -100,6 +83,8 @@ class SeasonsTableVC: UITableViewController {
     episodeDetailVC.seasonAndEpisodeLabel.text = "Season \(episode.season) Episode \(episode.episode)"
     episodeDetailVC.episodeTitleLabel.text = episode.title
     episodeDetailVC.descriptionLabel.text = episode.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+    
+    // If the episode has an original image
     if let originalImageURL = episode.originalImageURL,
       originalImageURL != "" {
       ShowController.shared.getImage(imageURL: originalImageURL) { [weak self] (result) in
@@ -107,17 +92,15 @@ class SeasonsTableVC: UITableViewController {
         switch result {
         case .success(let image):
           DispatchQueue.main.async {
+            self.indicator.stopAnimating()
             episodeDetailVC.showImageView.image = image
-            self.removeSpinner()
             self.present(episodeDetailVC, animated: true)
           }
         case .failure(let error):
           print(error)
-          self.removeSpinner()
         }
       }
     } else {
-      removeSpinner()
       present(episodeDetailVC, animated: true)
     }
   }
@@ -129,5 +112,22 @@ class SeasonsTableVC: UITableViewController {
   
   func setupTableView() {
     tableView.register(ShowTableViewCell.self, forCellReuseIdentifier: ShowTableViewCell.reuseID)
+  }
+  
+  func setupActivityIndicator() {
+    guard let navigationView = navigationController?.view
+      else { return }
+    navigationView.addSubview(indicator)
+    indicator.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Indicator Properties
+    indicator.hidesWhenStopped = true
+    
+    NSLayoutConstraint.activate([
+      indicator.centerXAnchor.constraint(equalTo: navigationView.centerXAnchor),
+      indicator.centerYAnchor.constraint(equalTo: navigationView.centerYAnchor),
+      indicator.heightAnchor.constraint(equalToConstant: 40),
+      indicator.widthAnchor.constraint(equalToConstant: 40)
+    ])
   }
 }

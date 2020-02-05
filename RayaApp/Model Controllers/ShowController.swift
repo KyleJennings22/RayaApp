@@ -12,8 +12,10 @@ import UIKit.UIImage
 class ShowController {
   static let shared = ShowController()
   
-  var seasons: [Season] = []
+  var showTask: URLSessionDataTask? = nil
+  let cache = NSCache<NSString, UIImage>()
   
+  /// Function to get all shows with specified search text
   func getShows(with searchText: String, completion: @escaping(Result<[Show], ShowAPIError>) -> Void) {
     
     // Creating the URL
@@ -31,21 +33,22 @@ class ShowController {
       else { return completion(.failure(.invalidURL)) }
     
     // Starting the Network Request
-    let session = URLSession.shared.dataTask(with: finalSearchURL) { (data, _, error) in
+    showTask = URLSession.shared.dataTask(with: finalSearchURL) { (data, _, error) in
       if let error = error {
         print(error, error.localizedDescription)
         return completion(.failure(.noData))
       }
       
+      // Making sure the data is not nil
       guard let data = data
         else { return completion(.failure(.invalidData)) }
       
       do {
         var showArray: [Show] = []
-        guard let shows = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]]
+        guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String: Any]]
           else { return completion(.failure(.unableToDecodeData)) }
         
-        for dict in shows {
+        for dict in json {
           guard let show = Show(dictionary: dict)
             else { continue }
           showArray.append(show)
@@ -57,21 +60,25 @@ class ShowController {
         return completion(.failure(.unableToDecodeData))
       }
     }
-    session.resume()
+    showTask?.resume()
   }
   
-  
+  // Function to get all seasons and episodes with specified show ID
   func getEpisodesFor(showID: Int, completion: @escaping(Result<[Season], ShowAPIError>) -> Void) {
+    
+    // Creating the URL
     guard let showURL = URL(string: baseURL.show.rawValue)
       else { return completion(.failure(.invalidURL)) }
     let showIDURL = showURL.appendingPathComponent("\(showID)").appendingPathComponent("episodes")
     
-    let session = URLSession.shared.dataTask(with: showIDURL) { (data, _, error) in
+    // Starting the session to grab the data
+    let task = URLSession.shared.dataTask(with: showIDURL) { (data, _, error) in
       if let error = error {
         print(error, error.localizedDescription)
         return completion(.failure(.noData))
       }
       
+      // Checking for nil
       guard let data = data
         else { return completion(.failure(.invalidData)) }
       
@@ -84,6 +91,7 @@ class ShowController {
           guard let season = Season(dictionary: dict)
             else { continue }
           
+          // If the season already exists, we want to append it to existing episodes in the season
           if seasons.contains(where: {$0.season == season.season}) {
             guard let episode = Episode(dictionary: dict),
               let index = seasons.firstIndex(of: season)
@@ -105,28 +113,7 @@ class ShowController {
       }
       
     }
-    session.resume()
-  }
-  
-  func getImage(imageURL: String, completion: @escaping(Result<UIImage, ShowAPIError>) -> Void) {
-    guard let fetchImageURL = URL(string: imageURL)
-      else { return completion(.failure(.invalidURL)) }
-    
-    let session = URLSession.shared.dataTask(with: fetchImageURL) { (data, _, error) in
-      if let error = error {
-        print(error, error.localizedDescription)
-        return completion(.failure(.noData))
-      }
-      
-      guard let data = data
-        else { return completion(.failure(.invalidData)) }
-      
-      guard let image = UIImage(data: data)
-        else { return completion(.failure(.unableToDecodeData)) }
-      
-      return completion(.success(image))
-    }
-    session.resume()
+    task.resume()
   }
 }
 

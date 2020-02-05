@@ -27,7 +27,7 @@ class EpisodeDetailVC: UIViewController {
     setupDescriptionLabel()
   }
   
-  // Custom Functions
+  // MARK: - Custom Functions
   func setupBlur() {
     let blur = UIVisualEffectView()
     blur.frame = view.frame
